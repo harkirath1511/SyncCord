@@ -84,7 +84,7 @@ function NewGroupHandler({ isOpen, onClose, currentUser }) {
       setError(null);
       
       const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/chat/createGrp`,
+        `${import.meta.env.VITE_SERVER_URL}/group/createGrp`,
         {
           name: groupName,
           members: selectedFriends

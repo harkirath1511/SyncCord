@@ -53,7 +53,7 @@ function Header({ currentUser, toggleDashboard }) {
   useEffect(() => {
     const getNotifications = async() => {
       try {
-        const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/users/getMyReqs`, {
+        const res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/request/getMyReqs`, {
           withCredentials: true
         });
         
@@ -106,7 +106,7 @@ function Header({ currentUser, toggleDashboard }) {
   const handleAcceptRequest = async (requestId) => {
     try {
       const res = await axios.patch(
-        `${import.meta.env.VITE_SERVER_URL}/users/acceptReq`, 
+        `${import.meta.env.VITE_SERVER_URL}/request/acceptReq`, 
         { reqId: requestId, accept: true }, 
         { withCredentials: true }
       );
@@ -125,7 +125,7 @@ function Header({ currentUser, toggleDashboard }) {
   const handleRejectRequest = async (requestId) => {
     try {
       const res = await axios.patch(
-        `${import.meta.env.VITE_SERVER_URL}/users/acceptReq`, 
+        `${import.meta.env.VITE_SERVER_URL}/request/acceptReq`, 
         { reqId: requestId, accept: false }, 
         { withCredentials: true }
       );
@@ -371,7 +371,7 @@ const handleSendRequest = async (secUserId) => {
   setReqMessage('');
   try {
     await axios.post(
-      `${import.meta.env.VITE_SERVER_URL}/users/sendReq`,
+      `${import.meta.env.VITE_SERVER_URL}/request/sendReq`,
       { secUserId },
       { withCredentials: true }
     );

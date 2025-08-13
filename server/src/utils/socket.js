@@ -14,6 +14,7 @@ export const getSocketIDs = (users)=>{
 
 export const emitEvent = (req, event , users, data)=>{
 
+
     const socketIds = getSocketIDs(users);
     const io = req.app.get('io');
 

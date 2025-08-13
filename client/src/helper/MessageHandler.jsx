@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { v4 as uuidv4 } from 'uuid';
 
 const MessageHandler = ({ 
   messages, 
@@ -15,6 +16,8 @@ const MessageHandler = ({
   const [audioStates, setAudioStates] = useState({});
   const [prevMessagesLength, setPrevMessagesLength] = useState(0);
   const [scrollHeight, setScrollHeight] = useState(0);
+
+
   
   // Replace the current useEffect for scrolling on chat selection
   useEffect(() => {
@@ -292,7 +295,7 @@ const MessageHandler = ({
           
           return (
             <div 
-              key={message.id} 
+              key={uuidv4()}
               className={`flex ${message.isOwn ? 'justify-end' : 'justify-start'}`}
             >
               <div className={`${message.isOwn ? 'bg-[rgb(216,252,211)] text-black' : 'bg-white border border-gray-200'} rounded-lg px-3 py-1.5 shadow-sm relative ${isAudio ? 'max-w-[95%] sm:max-w-[75%] md:max-w-[65%]' : 'max-w-[85%]'}`}>

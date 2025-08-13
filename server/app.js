@@ -34,6 +34,9 @@ app.use(cookieParser());
 //Routes 
 import userRouter from './src/routes/User.routes.js'
 import chatRouter from './src/routes/Chat.routes.js'
+import groupRouter from './src/routes/Group.routes.js'
+import messageRouter from './src/routes/Message.routes.js'
+import requestRouter from './src/routes/Request.routes.js'
 import { authHandler } from './src/utils/auth.js';
 
 
@@ -41,6 +44,9 @@ import { authHandler } from './src/utils/auth.js';
 app.get('/api/v1/auth', authHandler);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/chat', chatRouter);
+app.use('/api/v1/group', groupRouter);
+app.use('/api/v1/message', messageRouter);
+app.use('/api/v1/request', requestRouter);
 
 
 io.use((socket, next)=>{

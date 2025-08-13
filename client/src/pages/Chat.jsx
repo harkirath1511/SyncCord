@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
 import axios from 'axios'
 import { getSocket } from '../socket/socket.jsx'
-import { NEW_ATTACHEMENTS, NEW_MESSAGE } from '../constants/constants.js'
+import { NEW_ATTACHEMENTS, NEW_MESSAGE, NEW_MESSAGE_ALERT } from '../constants/constants.js'
 import auth from '../utils/auth.js'
 import MessageHandler from '../helper/MessageHandler.jsx'
 import AttachmentHandler from '../helper/AttachementHandler.jsx';
@@ -71,7 +71,7 @@ function Chat({ currentUser }) {
     try {
       
       const res = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/chat/getMessages/${selectedChat._id}?page=${page}`, 
+        `${import.meta.env.VITE_SERVER_URL}/message/getMessages/${selectedChat._id}?page=${page}`, 
         { withCredentials: true }
       );
       
@@ -176,7 +176,7 @@ function Chat({ currentUser }) {
           })
           setUsers(res.data.data)
         } else if (filter === 'groups') {
-          res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/users/getAllGrps`, {
+          res = await axios.get(`${import.meta.env.VITE_SERVER_URL}/group/getAllGrps`, {
             withCredentials: true
           })
           setUsers(res.data.data)
@@ -247,6 +247,8 @@ useEffect(() => {
   //
   useEffect(() => {
     if (selectedChat) {
+      // Clear messages immediately when switching chats to prevent showing old messages
+      setMessages([]);
       setChatMembers(selectedChat.members || []);
       
       // Reset pagination when changing chats
@@ -255,6 +257,8 @@ useEffect(() => {
       
       // Use your existing fetchMessages function with pagination
       fetchMessages(1, true);
+    // Clear message input when switching chats
+    setNewMessage('');
     }
   }, [selectedChat, currentUser])
 
@@ -306,7 +310,6 @@ const newAttachmentHandler = useCallback((data) => {
     };
 
     setMessages(prev => {
-      // Check if we already have a pending message to replace
       const pendingMessages = prev.filter(msg => msg.pending === true);
       if (pendingMessages.length > 0) {
         // Replace the first pending message with the confirmed one
@@ -320,10 +323,15 @@ const newAttachmentHandler = useCallback((data) => {
       }
     });
 
-    // Clear any pending attachments
     setPendingAttachments([]);
   }
 }, [selectedChat, currentUser.id]);
+
+
+
+const newAlertHandler = useCallback((data)=>{
+  console.log(data.chatId);
+})
 
 
   useEffect(() => {
@@ -343,6 +351,15 @@ const newAttachmentHandler = useCallback((data) => {
     }
   }, [newAttachmentHandler]);
 
+
+  useEffect(() => {
+    socket.on(NEW_MESSAGE_ALERT, newAlertHandler);
+  
+    return () => {
+      socket.off(NEW_MESSAGE_ALERT, newAlertHandler);
+    }
+  }, [newAlertHandler])
+  
 
   const fetchChatDetails = async (chatId) => {
     if (!chatId) return;
@@ -475,10 +492,8 @@ useEffect(() => {
   const handleUploadSuccess = (uploadedFileData, tempId) => {
   // Remove from pendingAttachments
   setPendingAttachments(prev => prev.filter(item => item.id !== tempId));
-  
   // Remove the temporary message with pending status
   setMessages(prev => prev.filter(msg => msg.id !== tempId));
-
 };
   
   // Handle upload error
@@ -562,7 +577,7 @@ const handleSendFile = async (customMessage = '') => {
   
   try {
     const response = await axios.post(
-      `${import.meta.env.VITE_SERVER_URL}/chat/message`,
+      `${import.meta.env.VITE_SERVER_URL}/message/message`,
       formData,
       {
         withCredentials: true,
@@ -620,7 +635,7 @@ const handleAddMembers = async () => {
     setAddMemberError(null);
     
     const response = await axios.patch(
-      `${import.meta.env.VITE_SERVER_URL}/chat/addMem`,
+      `${import.meta.env.VITE_SERVER_URL}/group/addMem`,
       {
         memberIds: selectedFriendsToAdd,
         chatId : selectedChat._id
@@ -678,7 +693,7 @@ const fetchAvailableFriends = async () => {
     setRemoveError(null);
     try {
       await axios.delete(
-        `${import.meta.env.VITE_SERVER_URL}/chat/removeMem`,
+        `${import.meta.env.VITE_SERVER_URL}/group/removeMem`,
         { memberId, chatId: selectedChat._id },
         { withCredentials: true }
       );
