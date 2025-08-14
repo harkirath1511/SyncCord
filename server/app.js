@@ -64,6 +64,7 @@ io.on("connection", (socket)=>{
     const user = socket?.user;
 
     socketIDs.set(user._id.toString(), socket.id);
+    io.to().emit()
     console.log(socketIDs);
 
     socket.on(NEW_MESSAGE, async (data)=>{

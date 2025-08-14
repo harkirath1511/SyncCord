@@ -35,6 +35,7 @@ function Home() {
           email: res.data.data.user.email,
           username: res.data.data.user.username,
           avatar: res.data.data.user.avatar,
+          status : 'online',
           joinedDate: new Date(res.data.data.user.createdAt).toLocaleDateString(
             'en-US', { 
               month: 'long', 

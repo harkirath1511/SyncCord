@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { validateAlphabeticString } from '../helper/stringCheck';
@@ -43,17 +43,14 @@ function Signup() {
   const handleFormSubmit = async(e) => {
     e.preventDefault();
     setIsLoading(true);
-   const validName = validateAlphabeticString(formData.fullName, {
-    allowSpaces : true
-   });
-   if(!validName.isValid){
-    setError(validName.error);
-    setIsLoading(false);
-    return ;
-   }
+    const validName = validateAlphabeticString(formData.fullName, { allowSpaces: true });
+    if (!validName.isValid) {
+      setError(validName.error);
+      setIsLoading(false);
+      return;
+    }
     setError('');
 
-    // Validation
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setIsLoading(false);
@@ -78,16 +75,11 @@ function Signup() {
       }
 
       const res = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/register`, formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true
       });
-      
       console.log(res);
-      // Redirect to login page after successful registration
       navigate('/login');
-      
     } catch (error) {
       console.log(error);
       setError(error.response?.data?.message || 'Registration failed. Please try again.');
@@ -96,283 +88,315 @@ function Signup() {
     }
   }
 
+  // Falling keyword chips (match Login)
+  const rainItems = useMemo(() => {
+    const words = ['Create', 'Profile', 'Avatar', 'Username', 'Groups', 'DMs', 'Media', 'Reactions', 'Files', 'Links', 'Mentions', 'Notifications']
+    const arr = []
+    const columns = [6, 14, 22, 30, 38, 46, 54, 62, 70, 78, 86, 94]
+    for (let i = 0; i < 18; i++) {
+      const word = words[i % words.length]
+      const left = columns[i % columns.length]
+      const duration = 8 + (i % 5) * 1.1
+      const delay = (i % 10) * 0.6
+      const variant = i % 3
+      arr.push({ word, left, duration, delay, variant, id: `kw-${i}` })
+    }
+    return arr
+  }, [])
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center p-4">
-      <div className="max-w-5xl w-full bg-white rounded-2xl shadow-2xl overflow-hidden">
-        <div className="flex flex-col lg:flex-row">
-          
-          {/* Left Side - Image Section */}
-          <div className="lg:w-2/5 bg-gradient-to-br from-purple-600 via-pink-600 to-red-500 p-8 flex flex-col justify-center items-center text-white relative overflow-hidden">
-            <div className="absolute inset-0 bg-black opacity-20"></div>
-            <div className="relative z-10 text-center">
-              <div className="mb-6">
-                <div className="w-24 h-24 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                  </svg>
-                </div>
-                <h1 className="text-4xl font-bold mb-4">Join Our Community!</h1>
-                <p className="text-lg opacity-90 mb-6">Create your account and start connecting with amazing people</p>
-                <div className="flex justify-center space-x-2">
-                  <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse"></div>
-                  <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" style={{animationDelay: '0.2s'}}></div>
-                  <div className="w-2 h-2 bg-white/60 rounded-full animate-pulse" style={{animationDelay: '0.4s'}}></div>
-                </div>
-              </div>
-              
-              {/* Decorative Elements */}
-              <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl"></div>
-              <div className="absolute bottom-10 right-10 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
-              <div className="absolute top-1/2 left-1/4 w-16 h-16 bg-white/10 rounded-full blur-lg"></div>
-            </div>
-          </div>
+    <div
+      className="h-screen w-full relative grid grid-cols-1 lg:grid-cols-2 overflow-hidden"
+      style={{
+        background: 'radial-gradient(1200px 600px at 75% 40%, rgba(0,0,0,0.03), transparent 60%), linear-gradient(#ffffff, #f7f7f8)'
+      }}
+    >
+      {/* Middle divider (match Login) */}
+      <div className="hidden lg:block absolute left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-gray-200 to-transparent pointer-events-none" />
 
-          {/* Right Side - Form Section */}
-          <div className="lg:w-3/5 p-8 lg:p-12">
-            <div className="max-w-md mx-auto">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h2>
-                <p className="text-gray-600">Fill in your details to get started</p>
-              </div>
+      {/* Left: copy + animated keyword rain */}
+      <section className="relative h-full overflow-hidden flex items-center justify-center px-10 py-10">
+        {/* Subtle dot pattern background */}
+        <div
+          className="absolute inset-0 -z-20 opacity-40"
+          style={{
+            backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)',
+            backgroundSize: '20px 20px',
+            WebkitMaskImage: 'radial-gradient(650px 420px at 35% 50%, rgba(0,0,0,1), rgba(0,0,0,0))',
+            maskImage: 'radial-gradient(650px 420px at 35% 50%, rgba(0,0,0,1), rgba(0,0,0,0))'
+          }}
+        />
 
-              {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-600 text-sm">{error}</p>
-                </div>
-              )}
-
-              <form onSubmit={handleFormSubmit} className="space-y-6">
-                {/* Avatar Upload */}
-                <div className="flex justify-center mb-6">
-                  <div className="relative">
-                    <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center overflow-hidden border-4 border-white shadow-lg">
-                      {avatarPreview ? (
-                        <img src={avatarPreview} alt="Avatar preview" className="w-full h-full object-cover" />
-                      ) : (
-                        <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                      )}
-                    </div>
-                    <label htmlFor="avatar" className="absolute bottom-0 right-0 bg-purple-600 text-white p-2 rounded-full cursor-pointer hover:bg-purple-700 transition duration-200">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      </svg>
-                    </label>
-                    <input
-                      type="file"
-                      id="avatar"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange(e, 'avatar')}
-                      className="hidden"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Full Name Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      name="fullName"
-                      placeholder="Enter your full name"
-                      value={formData.fullName}
-                      onChange={handleInputChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Username Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Username</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      name="username"
-                      placeholder="Choose a username"
-                      value={formData.username}
-                      onChange={handleInputChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Email Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Enter your email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Password Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="password"
-                      name="password"
-                      placeholder="Create a password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Confirm Password Input */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="password"
-                      name="confirmPassword"
-                      placeholder="Confirm your password"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition duration-200"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Cover Image Upload (Optional) */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Cover Image (Optional)</label>
-                  <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-purple-400 transition duration-200">
-                    {coverImgPreview ? (
-                      <div className="relative">
-                        <img src={coverImgPreview} alt="Cover preview" className="w-full h-32 object-cover rounded-lg" />
-                        <button
-                          type="button"
-                          onClick={() => {setCoverImg(null); setCoverImgPreview(null);}}
-                          className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-                          </svg>
-                        </button>
-                      </div>
-                    ) : (
-                      <div>
-                        <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                          <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
-                        <div className="flex text-sm text-gray-600">
-                          <label htmlFor="coverImg" className="relative cursor-pointer bg-white rounded-md font-medium text-purple-600 hover:text-purple-500 focus-within:outline-none">
-                            <span>Upload a cover image</span>
-                            <input
-                              id="coverImg"
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => handleFileChange(e, 'coverImg')}
-                              className="sr-only"
-                            />
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
-                        </div>
-                        <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Terms and Conditions */}
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                    required
-                  />
-                  <label className="ml-2 block text-sm text-gray-600">
-                    I agree to the{' '}
-                    <a href="#" className="text-purple-600 hover:text-purple-500 font-medium">
-                      Terms and Conditions
-                    </a>{' '}
-                    and{' '}
-                    <a href="#" className="text-purple-600 hover:text-purple-500 font-medium">
-                      Privacy Policy
-                    </a>
-                  </label>
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transform transition duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Creating Account...
-                    </div>
-                  ) : (
-                    'Create Account'
-                  )}
-                </button>
-
-                {/* Login Link */}
-                <div className="text-center">
-                  <p className="text-sm text-gray-600">
-                    Already have an account?{' '}
-                    <button
-                      type="button"
-                      onClick={() => navigate('/login')}
-                      className="font-medium text-purple-600 hover:text-purple-500"
-                    >
-                      Sign in here
-                    </button>
-                  </p>
-                </div>
-              </form>
-            </div>
+        {/* Corner art (rings + orbiting dots) */}
+        <div className="absolute -top-32 -left-32 w-[520px] h-[520px] pointer-events-none z-0 opacity-90">
+          <div className="relative w-full h-full">
+            <span className="corner-ring corner-ring-a"></span>
+            <span className="corner-ring corner-ring-b"></span>
+            <span className="corner-ring corner-ring-c"></span>
+            <span className="corner-orbit">
+              <span className="orbit-dot bg-blue-600"></span>
+              <span className="orbit-dot orbit-dot--small bg-gray-400"></span>
+            </span>
           </div>
         </div>
-      </div>
+
+        {/* Falling keywords layer */}
+        <div className="absolute inset-0 pointer-events-none select-none">
+          {rainItems.map(({ id, word, left, duration, delay, variant }) => (
+            <span
+              key={id}
+              className={`word-fall inline-flex items-center rounded-full border px-3 py-1 text-[12px] font-medium
+                ${variant === 0 ? 'bg-white text-gray-800 border-gray-200' : ''}
+                ${variant === 1 ? 'bg-gray-50 text-gray-700 border-gray-200' : ''}
+                ${variant === 2 ? 'bg-gray-100 text-gray-600 border-gray-200' : ''}`}
+              style={{ left: `${left}%`, animationDuration: `${duration}s`, animationDelay: `${delay}s` }}
+            >
+              <span className="mr-2 inline-block w-1.5 h-1.5 rounded-full bg-blue-600" />
+              {word}
+            </span>
+          ))}
+        </div>
+
+        {/* Live chat preview panel (match Login) */}
+        <div className="absolute left-12 bottom-12 hidden md:block">
+          <div className="w-[320px] rounded-2xl border border-gray-200 bg-white/80 backdrop-blur px-4 py-3 shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <span className="text-xs font-medium text-gray-600">Live preview</span>
+            </div>
+            <ul className="flex flex-col gap-2">
+              <li className="bubble bubble-1 bubble-in">Welcome! Set your profile.</li>
+              <li className="bubble bubble-2 bubble-out">Pick a unique username.</li>
+              <li className="bubble bubble-3 bubble-in">Upload an avatar.</li>
+              <li className="bubble bubble-4 bubble-out">You’re good to go!</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="max-w-xl w-full">
+          <div className="relative mb-10">
+            <div className="absolute -top-6 -left-2 animate-float">
+              <div className="px-4 py-2 rounded-full bg-gray-100 text-gray-800 border border-gray-200 text-sm font-semibold flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-blue-600" /> ChatVerse
+              </div>
+            </div>
+            <div className="absolute -bottom-6 left-24 animate-float2">
+              <div className="px-3 py-1.5 rounded-full bg-gray-100 text-gray-700 border border-gray-200 text-sm font-medium flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-blue-600" /> Create Profile
+              </div>
+            </div>
+            <div className="absolute -bottom-4 right-8 animate-float3">
+              <div className="px-4 py-2 rounded-full bg-gray-100 text-gray-700 border border-gray-200 text-sm font-medium flex items-center gap-2">
+                <span className="inline-block w-2 h-2 rounded-full bg-blue-600" /> Start Messaging
+              </div>
+            </div>
+          </div>
+
+          <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 mb-3">Create your account</h1>
+          <p className="text-base leading-relaxed text-gray-700 max-w-lg">
+            Set your avatar, choose a username, and join secure, real‑time conversations.
+          </p>
+        </div>
+      </section>
+
+      {/* Right: Signup form */}
+      <section className="relative h-full overflow-hidden flex items-center justify-center px-6 lg:px-16 py-10">
+        <div
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{ background: 'radial-gradient(500px 300px at 70% 35%, rgba(59,130,246,0.06), transparent 70%)' }}
+        />
+        <div className="w-full max-w-md">
+          <header className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900">Sign up</h2>
+            <p className="text-sm text-gray-600">It takes less than a minute.</p>
+          </header>
+
+          {error && (
+            <div className="mb-4 w-full p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleFormSubmit} className="space-y-4">
+            {/* Avatar */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Avatar</label>
+              <div className="flex items-center gap-3">
+                <div className="w-14 h-14 rounded-full bg-gray-200 overflow-hidden border">
+                  {avatarPreview ? <img src={avatarPreview} alt="avatar" className="w-full h-full object-cover" /> : null}
+                </div>
+                <label className="px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm font-medium text-gray-800 cursor-pointer hover:bg-gray-200">
+                  Upload
+                  <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'avatar')} className="hidden" required />
+                </label>
+              </div>
+            </div>
+
+            {/* Full name */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Full name</label>
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Your full name"
+                value={formData.fullName}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 rounded-xl bg-white text-gray-900 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 placeholder-gray-400"
+                required
+              />
+            </div>
+
+            {/* Username */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Username</label>
+              <input
+                type="text"
+                name="username"
+                placeholder="Choose a username"
+                value={formData.username}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 rounded-xl bg-white text-gray-900 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 placeholder-gray-400"
+                required
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Email</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="you@email.com"
+                value={formData.email}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 rounded-xl bg-white text-gray-900 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 placeholder-gray-400"
+                required
+              />
+            </div>
+
+            {/* Passwords */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-1.5">Password</label>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl bg-white text-gray-900 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 placeholder-gray-400"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-800 mb-1.5">Confirm</label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 rounded-xl bg-white text-gray-900 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600 placeholder-gray-400"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Cover image (optional) */}
+            <div>
+              <label className="block text-sm font-medium text-gray-800 mb-1.5">Cover image (optional)</label>
+              <div className="flex items-center gap-3">
+                <label className="px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm font-medium text-gray-800 cursor-pointer hover:bg-gray-200">
+                  Upload
+                  <input type="file" accept="image/*" onChange={(e) => handleFileChange(e, 'coverImg')} className="hidden" />
+                </label>
+                {coverImgPreview && (
+                  <button
+                    type="button"
+                    onClick={() => { setCoverImg(null); setCoverImgPreview(null); }}
+                    className="px-3 py-2 rounded-lg bg-gray-100 border border-gray-200 text-sm hover:bg-gray-200"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+              {coverImgPreview && (
+                <div className="mt-3 h-20 rounded-lg overflow-hidden border">
+                  <img src={coverImgPreview} alt="cover" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
+
+            {/* Terms */}
+            <div className="flex items-center gap-3">
+              <input type="checkbox" className="h-4 w-4 text-blue-600 border-gray-300 rounded" required />
+              <span className="text-sm text-gray-600">I agree to the Terms and Privacy Policy</span>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-3 rounded-xl bg-black text-white font-semibold hover:bg-neutral-800 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? 'Creating account...' : 'Create account'}
+            </button>
+
+            <p className="text-sm text-gray-700 text-center">
+              Already have an account?{' '}
+              <button type="button" onClick={() => navigate('/login')} className="font-semibold text-blue-600 hover:underline">
+                Sign in here
+              </button>
+            </p>
+          </form>
+        </div>
+      </section>
+
+      {/* Helpers (match Login animations) */}
+      <style>
+        {`
+          /* Corner art (top-left) */
+          .corner-ring{ position:absolute; top:0; left:0; border-radius:9999px; border:1px solid #e5e7eb; }
+          .corner-ring-a{ width:520px; height:520px; animation: ringPulse 12s ease-in-out infinite alternate; }
+          .corner-ring-b{ width:380px; height:380px; top:70px; left:70px; border-color:#dbeafe; animation: ringPulse 10s ease-in-out infinite alternate 0.6s; }
+          .corner-ring-c{ width:250px; height:250px; top:135px; left:135px; border-color:#e5e7eb; animation: ringPulse 8s ease-in-out infinite alternate 1.2s; }
+          @keyframes ringPulse{ from{ transform: rotate(0deg) scale(.98); opacity:.7; } to{ transform: rotate(2deg) scale(1.02); opacity:1; } }
+          .corner-orbit{ position:absolute; top:160px; left:160px; width:200px; height:200px; border-radius:9999px; animation: orbit 18s linear infinite; }
+          @keyframes orbit{ from{ transform: rotate(0deg);} to{ transform: rotate(360deg);} }
+          .orbit-dot{ position:absolute; width:10px; height:10px; border-radius:9999px; top:-5px; left:50%; transform:translateX(-50%); }
+          .orbit-dot--small{ width:8px; height:8px; top:auto; bottom:-4px; left:78%; }
+
+          /* Falling keywords */
+          .word-fall { position: absolute; top: -12%; animation-name: wordFall, swayX; animation-timing-function: linear, ease-in-out; animation-iteration-count: infinite, infinite; }
+          @keyframes wordFall { 0%{ transform: translateY(-12%); opacity:0;} 10%{opacity:1;} 100%{ transform: translateY(120%); opacity:.35;} }
+          @keyframes swayX { 0%,100%{ transform: translateY(var(--ty,0)) translateX(0);} 50%{ transform: translateY(var(--ty,0)) translateX(6px);} }
+
+          /* float chips */
+          .animate-float { animation: float 3.5s ease-in-out infinite; }
+          @keyframes float { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-10px);} }
+          .animate-float2 { animation: float2 4.2s ease-in-out infinite; }
+          @keyframes float2 { 0%,100% { transform: translateY(0);} 50% { transform: translateY(8px);} }
+          .animate-float3 { animation: float3 5s ease-in-out infinite; }
+          @keyframes float3 { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-6px);} }
+
+          /* Chat preview bubbles */
+          .bubble { max-width:85%; padding:10px 12px; border-radius:14px; font-size:13px; line-height:1.2; opacity:0; transform: translateY(8px); }
+          .bubble-in { align-self:flex-start; background:#f3f4f6; border:1px solid #e5e7eb; color:#111827; }
+          .bubble-out { align-self:flex-end; background:#111827; color:#fff; }
+          .bubble-1 { animation: bubble 16s linear infinite; }
+          .bubble-2 { animation: bubble 16s linear infinite 4s; }
+          .bubble-3 { animation: bubble 16s linear infinite 8s; }
+          .bubble-4 { animation: bubble 16s linear infinite 12s; }
+          @keyframes bubble { 0%{opacity:0; transform: translateY(8px) scale(.98);} 6%{opacity:1; transform: translateY(0) scale(1);} 24%{opacity:1;} 28%{opacity:0; transform: translateY(-6px) scale(.98);} 100%{opacity:0;} }
+
+          /* Reduced motion */
+          @media (prefers-reduced-motion: reduce) {
+            .word-fall, .animate-float, .animate-float2, .animate-float3, .corner-orbit, .corner-ring-a, .corner-ring-b, .corner-ring-c {
+              animation: none !important;
+            }
+          }
+        `}
+      </style>
     </div>
   )
 }

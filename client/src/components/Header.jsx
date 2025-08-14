@@ -517,7 +517,7 @@ const handleToggleDashboard = ()=>{
                 </svg>
               </button>
 
-              {/* Settings */}
+              {/* New Group */}
               <button 
                 className="p-2 text-gray-500 hover:text-gray-600 rounded-full hover:bg-gray-100 transition duration-200 relative group"
                 aria-label="Create new group"
@@ -527,7 +527,7 @@ const handleToggleDashboard = ()=>{
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path>
                 </svg>
                 
-                <span className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 px-2 py-1 text-xs font-medium text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                <span className="absolute top-full left-1/2 transform -translate-x-1/2 mb-1 px-2 py-0 text-xs font-medium text-gray-400 bg-gray-200 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
                   New Group
                 </span>
               </button>
