@@ -193,20 +193,29 @@ function Login() {
 
       {/* Right: blended form */}
       <section ref={rightRef} className="relative flex items-center justify-center px-6 lg:px-16 py-14">
+        {/* Enhanced animated gradient background */}
         <div
-          className="pointer-events-none absolute inset-0 -z-10"
+          className="pointer-events-none absolute inset-0 -z-10 form-gradient-bg"
           style={{
-            background: 'radial-gradient(500px 300px at 70% 35%, rgba(59,130,246,0.06), transparent 70%)'
+            background: 'radial-gradient(800px 400px at 70% 35%, rgba(59,130,246,0.12), rgba(147,51,234,0.06) 50%, transparent 80%)'
           }}
         />
-        <form onSubmit={handleFormSubmit} className="w-full max-w-md">
-          <header className="mb-8">
-            <div className="w-12 h-12 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        
+        {/* Glassmorphism form container */}
+        <div className="form-glass-container w-full max-w-md">
+          {/* Floating animated icon */}
+          <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 floating-icon">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-xl">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">Sign In</h2>
+          </div>
+          
+          <form onSubmit={handleFormSubmit} className="w-full">
+          <header className="mb-8 pt-12">
+            <h2 className="text-3xl font-bold text-gray-900 platform-text-animated">Sign In</h2>
+            <p className="text-sm text-gray-600 mt-2">Welcome back to ChatVerse</p>
           </header>
 
           {error && (
@@ -261,7 +270,7 @@ function Login() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-xl bg-black text-white font-semibold hover:bg-neutral-800 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="vibrant-button w-full py-3 rounded-xl font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
             >
               {isLoading ? (
                 <span className="flex items-center justify-center">
@@ -315,6 +324,7 @@ function Login() {
             </p>
           </div>
         </form>
+        </div>
       </section>
 
       {/* Helpers */}
@@ -399,9 +409,79 @@ function Login() {
 
           /* Reduced motion */
           @media (prefers-reduced-motion: reduce) {
-            .word-fall, .animate-float, .animate-float2, .animate-float3, .animate-blink, .corner-orbit, .ring-1, .ring-2, .ring-3 {
+            .word-fall, .animate-float, .animate-float2, .animate-float3, .animate-blink, .corner-orbit, .ring-1, .ring-2, .ring-3, .floating-icon, .form-gradient-bg, .platform-text-animated {
               animation: none !important;
             }
+          }
+
+          /* NEW: Enhanced UI Effects */
+          
+          /* Animated gradient background */
+          .form-gradient-bg {
+            animation: gradientShift 8s ease-in-out infinite;
+          }
+          @keyframes gradientShift {
+            0%, 100% { 
+              background: radial-gradient(800px 400px at 70% 35%, rgba(59,130,246,0.12), rgba(147,51,234,0.06) 50%, transparent 80%);
+            }
+            50% { 
+              background: radial-gradient(900px 450px at 75% 40%, rgba(147,51,234,0.15), rgba(59,130,246,0.08) 50%, transparent 85%);
+            }
+          }
+
+          /* Glassmorphism form container */
+          .form-glass-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            position: relative;
+            transition: all 0.3s ease;
+          }
+          
+          .form-glass-container:hover {
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2), 0 8px 32px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+          }
+
+          /* Floating animated icon */
+          .floating-icon {
+            animation: floatIcon 4s ease-in-out infinite;
+          }
+          @keyframes floatIcon {
+            0%, 100% { transform: translateX(-50%) translateY(0px) rotate(0deg); }
+            25% { transform: translateX(-50%) translateY(-8px) rotate(1deg); }
+            50% { transform: translateX(-50%) translateY(0px) rotate(0deg); }
+            75% { transform: translateX(-50%) translateY(-5px) rotate(-1deg); }
+          }
+
+          /* Vibrant button with gradient and glow */
+          .vibrant-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+          }
+          
+          .vibrant-button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+            box-shadow: 0 6px 25px rgba(102, 126, 234, 0.5), 0 0 30px rgba(118, 75, 162, 0.3);
+            transform: translateY(-2px);
+          }
+
+          .vibrant-button:active:not(:disabled) {
+            transform: translateY(0px);
+          }
+
+          /* Platform text animation */
+          .platform-text-animated {
+            animation: textGlow 3s ease-in-out infinite;
+          }
+          @keyframes textGlow {
+            0%, 100% { text-shadow: 0 0 5px rgba(59, 130, 246, 0.1); }
+            50% { text-shadow: 0 0 15px rgba(59, 130, 246, 0.2), 0 0 25px rgba(147, 51, 234, 0.1); }
           }
         `}
       </style>
